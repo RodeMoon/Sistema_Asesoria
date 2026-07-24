@@ -1,9 +1,10 @@
 {
+    "titulo": "Registro de Asesorías Académicas",
     "codigo": "CE-RG-25",
     "emision": "31-03-2025",
     "revision": "07",
-    "titulo": "Registro de asesorías académicas",
-    "logo_izq": "D:/1_CV_test/H_System/assets/GTO_EDU.png",
-    "logo_cen": "D:/1_CV_test/H_System/assets/UPJR.png",
-    "logo_der": "D:/1_CV_test/H_System/assets/EDU_MX.png"
+    "periodo": "Mayo - Agosto 2026",
+    "logo_izq": "d:\\1_CV_test\\H_System\\assets\\GTO_EDU.png",
+    "logo_cen": "d:\\1_CV_test\\H_System\\assets\\UPJR.png",
+    "logo_der": "d:\\1_CV_test\\H_System\\assets\\EDU_MX.png"
 }
