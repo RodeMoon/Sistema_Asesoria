@@ -20,12 +20,22 @@ class ProcesadorDatos:
             df_asesorias = pd.read_excel(ruta_asesorias)
             df_maestra = pd.read_excel(ruta_lista)
             
-            # 2. Buscar columnas de matrícula dinámicamente (Tu excelente implementación)
+            # Buscar la columna que contenga la palabra 'correo' o 'dirección'
+            col_correo = next((c for c in df_asesorias.columns if 'correo' in str(c).lower() or 'email' in str(c).lower()), None)
+            
+            if col_correo:
+                # Tomamos el correo (ej. 323030001@upjr.edu.mx), lo partimos en el '@' y nos quedamos con la primera parte [0]
+                df_asesorias['No. de control'] = df_asesorias[col_correo].astype(str).str.split('@').str[0].str.strip()
+                self.escribir_consola("[*] Matrículas extraídas exitosamente de los correos.")
+            else:
+                self.escribir_consola("[ADVERTENCIA] No se encontró la columna de correo. Se buscará matrícula manual.")
+
+            # 2. Buscar columnas dinámicamente
             col_ctrl_asesorias = next((c for c in df_asesorias.columns if 'control' in str(c).lower()), 'No. de control')
             col_ctrl_maestra = next((c for c in df_maestra.columns if 'control' in str(c).lower()), 'No. de control')
             col_estatus = next((c for c in df_maestra.columns if 'estatus' in str(c).lower()), 'Estatus')
 
-            # 3. Limpieza avanzada (Con tu regex para floats de Excel)
+            # 3. Limpieza avanzada 
             df_asesorias[col_ctrl_asesorias] = df_asesorias[col_ctrl_asesorias].astype(str).str.strip().str.replace(r'\.0$', '', regex=True).str.upper()
             df_maestra[col_ctrl_maestra] = df_maestra[col_ctrl_maestra].astype(str).str.strip().str.replace(r'\.0$', '', regex=True).str.upper()
             
@@ -60,7 +70,7 @@ class ProcesadorDatos:
 
             # Guardar el DataFrame limpio para que generador_pdf lo pueda consumir
             self.df_asesorias_limpio = df_asesorias
-            self.df_maestra = df_maestra
+            self.df_maestra = df_maestra 
             self.escribir_consola("\n[OK] Análisis completado. Listo para exportar PDFs.")
             return True
             
