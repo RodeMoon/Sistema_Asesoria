@@ -3,7 +3,6 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import threading    
 
-# --- TUS NUEVOS MÓDULOS SEPARADOS ---
 from configuracion import ManejadorConfiguracion
 from generador_pdf import GeneradorPDF
 from procesador_datos import ProcesadorDatos
@@ -13,7 +12,7 @@ class SistemaAsesorias(tk.Tk):
         super().__init__()
 
         # --- VENTANA PRINCIPAL ---
-        self.title("Análisis de Asesorías UPJR")
+        self.title("Análisis de asesorías UPJR")
         self.geometry("880x750")
         self.minsize(880, 750)
 
@@ -27,7 +26,6 @@ class SistemaAsesorias(tk.Tk):
         self.configure(bg=self.c_fondo)
 
         # --- INSTANCIAR MÓDULOS EXTERNOS ---
-        # CORRECCIÓN: Cambiamos el nombre de la variable a gestor_config
         self.gestor_config = ManejadorConfiguracion()
         self.pdf_engine = GeneradorPDF(self.gestor_config, self.escribir_consola)
         self.procesador = ProcesadorDatos(self.escribir_consola)
@@ -38,7 +36,7 @@ class SistemaAsesorias(tk.Tk):
         self.ruta_asesorias = None
         self.ruta_lista = None
 
-        # Construir Interfaz
+        # Construir interfaz
         self.crear_menu()
         self.crear_interfaz()
 
@@ -63,61 +61,57 @@ class SistemaAsesorias(tk.Tk):
 
     def abrir_ventana_configuracion(self):
         win = tk.Toplevel(self)
-        win.title("Configuración de Encabezado y Período")
-        win.geometry("600x520")
+        win.title("Configuración de encabezado y período")
+        win.geometry("600x560")
         win.configure(bg=self.c_fondo)
         win.resizable(False, False)
         win.grab_set()
 
-        ttk.Label(win, text="Parámetros Institucionales", style="Titulo.TLabel").pack(pady=15)
+        ttk.Label(win, text="Parámetros institucionales", style="Titulo.TLabel").pack(pady=15)
         frame = ttk.Frame(win, padding=20)
         frame.pack(fill="both", expand=True)
 
-        labels = ["Título del Formato:", "Código del Formato:", "Fecha de Emisión:", "Revisión:", "Período Escolar:"]
-        keys = ["titulo", "codigo", "emision", "revision", "periodo"]
+        labels = ["Título del formato:", "Código del formato:", "Fecha de emisión:", "Revisión:", "Período escolar:", "Carrera:"]
+        keys = ["titulo", "codigo", "emision", "revision", "periodo", "carrera"]
         entries = {}
 
         for i, (text, key) in enumerate(zip(labels, keys)):
             ttk.Label(frame, text=text, font=("Segoe UI", 10, "bold")).grid(row=i, column=0, sticky="w", pady=6)
             ent = ttk.Entry(frame, width=45, font=("Segoe UI", 10))
-            # CORRECCIÓN: Usar gestor_config
             ent.insert(0, self.gestor_config.config_data.get(key, ""))
             ent.grid(row=i, column=1, pady=6, padx=10)
             entries[key] = ent
 
-        ttk.Separator(frame, orient="horizontal").grid(row=5, column=0, columnspan=2, sticky="ew", pady=15)
+        ttk.Separator(frame, orient="horizontal").grid(row=6, column=0, columnspan=2, sticky="ew", pady=15)
 
         def crear_selector_logo(fila, texto_label, clave_config):
             ttk.Label(frame, text=texto_label, font=("Segoe UI", 10, "bold")).grid(row=fila, column=0, sticky="w", pady=6)
             frame_btn = ttk.Frame(frame)
             frame_btn.grid(row=fila, column=1, sticky="w", padx=10)
             
-            # CORRECCIÓN: Usar gestor_config
             lbl_ruta = ttk.Label(frame_btn, text=os.path.basename(self.gestor_config.config_data.get(clave_config, '')) or "Sin logo", width=25, style="Ruta.TLabel")
             lbl_ruta.pack(side="left")
 
             def seleccionar():
                 ruta = filedialog.askopenfilename(filetypes=[("Imágenes", "*.png;*.jpg;*.jpeg")])
                 if ruta:
-                    # CORRECCIÓN: Usar gestor_config
                     self.gestor_config.config_data[clave_config] = ruta
                     lbl_ruta.config(text=os.path.basename(ruta), foreground=self.c_azul)
             
             ttk.Button(frame_btn, text="Examinar", command=seleccionar).pack(side="left", padx=5)
 
-        crear_selector_logo(6, "Logo Izquierdo (Gto):", "logo_izq")
-        crear_selector_logo(7, "Logo Central (UPJR):", "logo_cen")
-        crear_selector_logo(8, "Logo Derecho (Educ):", "logo_der")
+        crear_selector_logo(7, "Logo izquierdo (Gto):", "logo_izq")
+        crear_selector_logo(8, "Logo central (UPJR):", "logo_cen")
+        crear_selector_logo(9, "Logo derecho (Educ):", "logo_der")
 
         def guardar_cambios():
             for key in keys:
-                # CORRECCIÓN: Usar gestor_config
                 self.gestor_config.config_data[key] = entries[key].get()
             self.gestor_config.guardar_configuracion()
             messagebox.showinfo("Éxito", "Configuración guardada correctamente.", parent=win)
             win.destroy()
 
-        ttk.Button(win, text="Guardar Cambios", style="Accion.TButton", command=guardar_cambios).pack(pady=15)
+        ttk.Button(win, text="Guardar cambios", style="Accion.TButton", command=guardar_cambios).pack(pady=15)
 
     def crear_menu(self):
         menubar = tk.Menu(self, bg=self.c_fondo, fg=self.c_texto)
@@ -126,10 +120,9 @@ class SistemaAsesorias(tk.Tk):
         menubar.add_cascade(label="Archivo", menu=menu_archivo)
 
         menu_ajustes = tk.Menu(menubar, tearoff=0, bg="white", fg=self.c_texto)
-        menu_ajustes.add_command(label="Ajustes de Reporte...", command=self.abrir_ventana_configuracion)
+        menu_ajustes.add_command(label="Ajustes de reporte...", command=self.abrir_ventana_configuracion)
         menubar.add_cascade(label="Configuración", menu=menu_ajustes)
-        
-        # Ahora esto funcionará correctamente
+
         self.config(menu=menubar)
 
     def crear_interfaz(self):
@@ -139,22 +132,22 @@ class SistemaAsesorias(tk.Tk):
         ttk.Label(frame_header, text="Universidad Politécnica de Juventino Rosas", font=("Segoe UI", 11)).pack()
 
         # --- SECCIÓN 1: ARCHIVOS ---
-        frame_archivos = ttk.LabelFrame(self, text=" 1. Carga de Datos ", padding=(20, 15))
+        frame_archivos = ttk.LabelFrame(self, text=" 1. Carga de datos ", padding=(20, 15))
         frame_archivos.pack(pady=10, padx=25, fill="x")
 
-        ttk.Button(frame_archivos, text="📄 Cargar Formulario (.xlsx)", command=self.cargar_archivo_asesorias).grid(row=0, column=0, padx=(0, 15), pady=8)
+        ttk.Button(frame_archivos, text="Cargar formulario (.xlsx)", command=self.cargar_archivo_asesorias).grid(row=0, column=0, padx=(0, 15), pady=8)
         self.lbl_ruta_asesorias = ttk.Label(frame_archivos, text="Ningún archivo seleccionado...", style="Ruta.TLabel")
         self.lbl_ruta_asesorias.grid(row=0, column=1, sticky="w")
 
-        ttk.Button(frame_archivos, text="📋 Cargar Lista de Alumnos", command=self.cargar_archivo_lista).grid(row=1, column=0, padx=(0, 15), pady=8)
+        ttk.Button(frame_archivos, text="Cargar lista de alumnos (.xlsx)", command=self.cargar_archivo_lista).grid(row=1, column=0, padx=(0, 15), pady=8)
         self.lbl_ruta_lista = ttk.Label(frame_archivos, text="Ningún archivo seleccionado...", style="Ruta.TLabel")
         self.lbl_ruta_lista.grid(row=1, column=1, sticky="w")
 
         # --- SECCIÓN 2: PROCESAMIENTO ---
-        frame_procesar = ttk.LabelFrame(self, text=" 2. Análisis de Datos ", padding=(20, 15))
+        frame_procesar = ttk.LabelFrame(self, text=" 2. Análisis de datos ", padding=(20, 15))
         frame_procesar.pack(pady=10, padx=25, fill="x")
 
-        ttk.Button(frame_procesar, text="⚙️ Calcular Indicadores", command=lambda: threading.Thread(target=self.procesar_datos, daemon=True).start()).pack(pady=(0, 10), anchor="w")
+        ttk.Button(frame_procesar, text="Calcular indicadores", command=lambda: threading.Thread(target=self.procesar_datos, daemon=True).start()).pack(pady=(0, 10), anchor="w")
 
         self.consola = tk.Text(frame_procesar, height=10, wrap="word", font=("Consolas", 10), bg="white", fg=self.c_texto,
                                highlightthickness=1, highlightbackground=self.c_sombra, highlightcolor=self.c_azul,
@@ -164,16 +157,16 @@ class SistemaAsesorias(tk.Tk):
         self.consola.config(state="disabled")
 
         # --- SECCIÓN 3: EXPORTACIÓN ---
-        frame_reportes = ttk.LabelFrame(self, text=" 3. Exportar Reportes ", padding=(20, 15))
+        frame_reportes = ttk.LabelFrame(self, text=" 3. Exportar reportes ", padding=(20, 15))
         frame_reportes.pack(pady=10, padx=25, fill="x")
 
         frame_botones_pdf = ttk.Frame(frame_reportes)
         frame_botones_pdf.pack(anchor="center")
 
-        ttk.Button(frame_botones_pdf, text="📥 Reporte Jefatura", style="Accion.TButton", 
+        ttk.Button(frame_botones_pdf, text="Reporte jefatura", style="Accion.TButton", 
                     command=lambda: threading.Thread(target=self.generar_pdf_jefatura, daemon=True).start()).grid(row=0, column=0, padx=15, pady=10)
         
-        ttk.Button(frame_botones_pdf, text="📥 Reportes Docentes", style="Accion.TButton", 
+        ttk.Button(frame_botones_pdf, text="Reportes docentes", style="Accion.TButton", 
                     command=lambda: threading.Thread(target=self.generar_pdf_docente, daemon=True).start()).grid(row=0, column=1, padx=15, pady=10)
 
     # --- FUNCIONES DE INTERFAZ Y PUENTES A LOS MÓDULOS ---
@@ -204,16 +197,18 @@ class SistemaAsesorias(tk.Tk):
         self.procesador.procesar(self.ruta_asesorias, self.ruta_lista)
 
     def generar_pdf_jefatura(self):
-        if self.procesador.df_asesorias_limpio is None:
+        if self.procesador.df_asesorias_limpio is None or getattr(self.procesador, 'df_maestra', None) is None:
             self.escribir_consola("[ERROR] Calcula los indicadores primero.")
             return
-        self.pdf_engine.generar_reporte_jefatura(self.procesador.df_asesorias_limpio, self.ruta_lista)
+        # AHORA ENVIAMOS LA VARIABLE EN MEMORIA:
+        self.pdf_engine.generar_reporte_jefatura(self.procesador.df_asesorias_limpio, self.procesador.df_maestra)
 
     def generar_pdf_docente(self):
-        if self.procesador.df_asesorias_limpio is None:
+        if self.procesador.df_asesorias_limpio is None or getattr(self.procesador, 'df_maestra', None) is None:
             self.escribir_consola("[ERROR] Calcula los indicadores primero.")
             return
-        self.pdf_engine.generar_reporte_docentes(self.procesador.df_asesorias_limpio, self.ruta_lista)
+        # AHORA ENVIAMOS LA VARIABLE EN MEMORIA:
+        self.pdf_engine.generar_reporte_docentes(self.procesador.df_asesorias_limpio, self.procesador.df_maestra)
 
 if __name__ == "__main__":
     app = SistemaAsesorias()
